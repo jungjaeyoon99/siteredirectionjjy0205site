@@ -83,7 +83,7 @@
     
     <!-- 1. 인증 영역 -->
     <div id="authSection">
-      <input type="password" id="passwordInput" placeholder="비밀번호를 입력하세요" onkeydown="if(event.key === 'Enter') checkPassword()">
+      <input type="password" id="passwordInput" placeholder="Enter Password..." onkeydown="if(event.key === 'Enter') checkPassword()">
       <button class="btn" onclick="checkPassword()">Enter</button>
     </div>
 
@@ -122,7 +122,7 @@
       const messageDiv = document.getElementById("message");
 
       if (!inputPw) {
-        messageDiv.innerText = "비밀번호를 입력해 주세요.";
+        messageDiv.innerText = "Enter Password";
         return;
       }
 
