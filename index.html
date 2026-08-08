@@ -84,7 +84,7 @@
     <!-- 1. 인증 영역 -->
     <div id="authSection">
       <input type="password" id="passwordInput" placeholder="비밀번호를 입력하세요" onkeydown="if(event.key === 'Enter') checkPassword()">
-      <button class="btn" onclick="checkPassword()">확인</button>
+      <button class="btn" onclick="checkPassword()">Enter</button>
     </div>
 
     <!-- 2. 서브도메인 선택 영역 (인증 성공 시 표시) -->
@@ -127,7 +127,7 @@
       }
 
       messageDiv.style.color = "black";
-      messageDiv.innerText = "확인 중...";
+      messageDiv.innerText = "Checking...";
 
       try {
         const dbRef = ref(db);
@@ -139,7 +139,7 @@
           if (inputPw === String(correctPw)) {
             // 인증 성공 시 처리
             messageDiv.innerText = "";
-            document.getElementById("title").innerText = "서브도메인 선택";
+            document.getElementById("title").innerText = "Select Subdomain";
             
             // 비밀번호 입력창은 숨기고, 서브도메인 버튼 목록을 띄웁니다.
             document.getElementById("authSection").style.display = "none";
