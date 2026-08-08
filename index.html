@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 360px;
+    }
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+    .btn:hover {
+      background-color: #0056b3;
+    }
+    /* 서브도메인 버튼 목록 스타일 */
+    .link-list {
+      display: none; /* 초기에는 숨김 */
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .btn-subdomain {
+      background-color: #28a745;
+      color: white;
+      text-decoration: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: background-color 0.2s;
+      display: block;
+    }
+    .btn-subdomain:hover {
+      background-color: #218838;
+    }
+    #message {
+      margin-top: 15px;
+      font-size: 14px;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2 id="title">관리자 인증</h2>
+    
+    <!-- 1. 인증 영역 -->
+    <div id="authSection">
+      <input type="password" id="passwordInput" placeholder="비밀번호를 입력하세요" onkeydown="if(event.key === 'Enter') checkPassword()">
+      <button class="btn" onclick="checkPassword()">확인</button>
+    </div>
+
+    <!-- 2. 서브도메인 선택 영역 (인증 성공 시 표시) -->
+    <div id="subdomainSection" class="link-list">
+      <!-- 원하는 서브도메인 링크들을 자유롭게 추가/수정하세요 -->
+      <a href="https://my.jjy0205.site" class="btn-subdomain">마이페이지 (my.jjy0205.site)</a>
+      <a href="https://app.jjy0205.site" class="btn-subdomain">앱 서비스 (app.jjy0205.site)</a>
+      <a href="https://dev.jjy0205.site" class="btn-subdomain">개발용 테스트 (dev.jjy0205.site)</a>
+      <a href="https://canva.jjy0205.site" class="btn-subdomain">캔바 페이지 (canva.jjy0205.site)</a>
+    </div>
+
+    <div id="message"></div>
+  </div>
+
+  <!-- Firebase 모듈 CDN -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    window.checkPassword = async function() {
+      const inputPw = document.getElementById("passwordInput").value;
+      const messageDiv = document.getElementById("message");
+
+      if (!inputPw) {
+        messageDiv.innerText = "비밀번호를 입력해 주세요.";
+        return;
+      }
+
+      messageDiv.style.color = "black";
+      messageDiv.innerText = "확인 중...";
+
+      try {
+        const dbRef = ref(db);
+        const snapshot = await get(child(dbRef, "admin_password"));
+
+        if (snapshot.exists()) {
+          const correctPw = snapshot.val();
+
+          if (inputPw === String(correctPw)) {
+            // 인증 성공 시 처리
+            messageDiv.innerText = "";
+            document.getElementById("title").innerText = "서브도메인 선택";
+            
+            // 비밀번호 입력창은 숨기고, 서브도메인 버튼 목록을 띄웁니다.
+            document.getElementById("authSection").style.display = "none";
+            document.getElementById("subdomainSection").style.display = "flex";
+
+          } else {
+            messageDiv.style.color = "red";
+            messageDiv.innerText = "비밀번호가 올바르지 않습니다.";
+          }
+        } else {
+          messageDiv.style.color = "red";
+          messageDiv.innerText = "DB에 설정된 비밀번호가 없습니다.";
+        }
+      } catch (error) {
+        console.error(error);
+        messageDiv.style.color = "red";
+        messageDiv.innerText = "오류가 발생했습니다.";
+      }
+    };
+  </script>
+
+</body>
+</html>
